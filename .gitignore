@@ -8,6 +8,8 @@ dist-ssr
 *.local
 yarn.lock
 
+.env
+
 # Database
 orders.db
 
