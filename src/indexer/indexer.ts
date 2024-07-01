@@ -21,18 +21,18 @@ export async function IndexOrders(tonApi: AxiosInstance, db: OrdersDatabase) {
         if (transactions.length === 0) {
             logger.info(`[IndexOrders] All transactions were successfully indexed`);
             before_lt = 0;
-            await sleep(10000);
+            await sleep(60000);
             continue;
         }
         if (await db.isTxExists(transactions[0].hash)) {
             logger.info(`[IndexOrders] Already indexed, no new changes found`);
             before_lt = 0;
-            await sleep(5000);
+            await sleep(60000);
             continue;
         }
 
         for (const transaction of transactions) {
-            if (await db.isTxExists(transaction.hash)) continue;
+            if (await db.isTxExists(transaction.hash)) break;
             await db.addTransaction(transaction.hash, transaction.utime * 1000);
 
             before_lt = transaction.lt;

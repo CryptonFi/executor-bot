@@ -1,6 +1,7 @@
 import { Address } from '@ton/core';
 
 // Testnet
+export const IS_TESTNET = true;
 export const CRYPTON_MASTER_ADDRESS = Address.parse('EQADNWMDEpeeQKW2Diy2nz04LtRDWdpuydKTPVyFZqI9PZpt');
 export const TON_API_ENDPOINT = 'https://testnet.tonapi.io/';
 export const DB_FILE_NAME = 'orders.db';

@@ -6,6 +6,7 @@ import { logger } from '../logger';
 import { ADDRESS_CURRENCIES } from '../config';
 import { Order } from '../models';
 import { JettonMinter } from './wrappers/jetton_minter';
+import { GetAddressFriendly } from '../utils';
 
 export async function FetchOrderDetails(tonClient: TonClient, userOrderAddress: Address): Promise<Array<Order>> {
     const ordersList: Array<Order> = [];
@@ -70,13 +71,12 @@ export async function ExecuteOrder(
 ) {
     var msg;
     const executorAddr = contract.address;
-    console.log(`Executor address: ${executorAddr}`);
     if (order.orderType !== OrderType.JETTON_TON) {
         const jettonToContract = tonClient.open(JettonMinter.createFromAddress(order.toMasterAddress!));
         const executorJettonWalletAddr = await jettonToContract.getWalletAddress(executorAddr);
         msg = {
-            value: toNano(0.2).toString(),
-            to: executorJettonWalletAddr.toString(),
+            value: toNano(0.2),
+            to: GetAddressFriendly(executorJettonWalletAddr),
             body: beginCell()
                 .storeUint(0xf8a7ea5, 32) // op code - jetton transfer
                 .storeUint(queryId, 64)
@@ -84,7 +84,7 @@ export async function ExecuteOrder(
                 .storeAddress(Address.parse(userOrderAddr))
                 .storeAddress(executorAddr)
                 .storeBit(0)
-                .storeCoins(toNano('0.2'))
+                .storeCoins(toNano(0.1))
                 .storeBit(1)
                 .storeRef(
                     beginCell()
@@ -97,8 +97,8 @@ export async function ExecuteOrder(
         };
     } else {
         msg = {
-            value: (toNano(0.2) + order.toAmount).toString(),
-            to: userOrderAddr.toString(),
+            value: toNano(0.2) + order.toAmount,
+            to: GetAddressFriendly(Address.parse(userOrderAddr)),
             body: beginCell()
                 .storeUint(0x3b016c81, 32) // execute_order
                 .storeUint(queryId, 64)
